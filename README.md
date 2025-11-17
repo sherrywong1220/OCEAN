@@ -48,8 +48,11 @@ LD_PRELOAD=/root/libmpi_cxl_shim.so mpirun --allow-run-as-root -np 2 -hostfile h
 ```bash
 cd workloads/tigon
 ./scripts/setup.sh HOST
-./scripts/run.sh TPCC TwoPLPasha 8 3 mixed 10 15 1 0 1 Clock OnDemand 200000000 1 WriteThrough None 15 5 GROUP_WAL 20000 0 0
-./scripts/run_tpcc.sh ./results/test1
+./emulation/image/make_vm_img.sh
+sudo ./emulation/start_vms.sh --using-old-img --cxl 0 5 2 0 1 # using 2 hosts
+./scripts/setup.sh VMS 2
+./scripts/run.sh COMPILE_SYNC 2
+./scripts/run_tpcc_dax.sh TwoPLPasha 2 3 mixed 10 15 1 0 1 Clock OnDemand 200000000 1 WriteThrough None 15 5 GROUP_WAL 20000 0 0
 ```
 
 
