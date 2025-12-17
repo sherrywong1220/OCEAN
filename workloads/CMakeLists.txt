@@ -6,6 +6,7 @@ add_subdirectory(llama.cpp)
 #add_subdirectory(gromacs)
 add_executable(memcached-YCSB memcached-YCSB.cpp)
 
+
 macro(memcached_build)
     set(memcached_src ${CMAKE_CURRENT_SOURCE_DIR}/memcached)
     add_custom_target(memcached_cfg ./autogen.sh

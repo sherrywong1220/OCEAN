@@ -4,6 +4,7 @@
 #include <vector>
 #include <syscall.h>
 #include <unistd.h>
+ #include <memory>
 #include <signal.h>
 
 // 显示线程ID的辅助函数

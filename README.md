@@ -53,6 +53,7 @@ LD_PRELOAD=/root/libmpi_cxl_shim.so mpirun --allow-run-as-root -np 2 -hostfile h
 ```bash
 cd workloads/tigon
 ./scripts/setup.sh HOST
+./scripts/run.sh COMPILE_SYNC 2
 ./scripts/run.sh TPCC TwoPLPasha 8 3 mixed 10 15 1 0 1 Clock OnDemand 200000000 1 WriteThrough None 15 5 GROUP_WAL 20000 0 0
 ./scripts/run_tpcc.sh ./results/test1
 ```
@@ -60,5 +61,9 @@ cd workloads/tigon
 
 ## OSU Benchmark
 ```bash
+# Inside host 1:
+export CXL_DAX_PATH="/dev/dax0.0"
+export CXL_DAX_RESET=1  # Reset allocation counter on first process
+export CXL_SHIM_VERBOSE=1
 LD_PRELOAD=/root/libmpi_cxl_shim.so mpirun --allow-run-as-root -np 2 -hostfile hostfile_cp -x CXL_DAX_PATH -x CXL_DAX_RESET -x CXL_SHIM_VERBOSE -x LD_PRELOAD ~/osu-micro-benchmarks/mpi/collective/osu_allgather
 ```

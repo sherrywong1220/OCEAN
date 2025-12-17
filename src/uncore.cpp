@@ -8,7 +8,7 @@
  *  Copyright 2025 Regents of the University of California
  *  UC Santa Cruz Sluglab.
  */
-
+#include <ranges>
 #include "uncore.h"
 #include <climits>
 #include <fcntl.h>
