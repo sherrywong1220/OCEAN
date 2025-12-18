@@ -31,6 +31,10 @@ shutdown now
 sudo ../launch_qemu_cxl.sh 
 sudo ../launch_qemu_cxl1.sh 
 ```
+Make sure "/dev/dax0.0" exists inside both VM:
+```bash
+ls /dev/dax0.0
+```
 
 ## GROMACS
 Change the hostfile in host 1 to reflect the number of hosts. 
