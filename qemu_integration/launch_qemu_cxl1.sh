@@ -17,7 +17,7 @@ $QEMU_BINARY \
     -M q35,cxl=on \
     -kernel ./bzImage \
     -append "root=/dev/sda rw console=ttyS0,115200 nokaslr" \
-    -drive file=./qemu.img,index=0,media=disk,format=raw \
+    -drive file=./qemu1.img,index=0,media=disk,format=raw \
     -netdev tap,id=net0,ifname=tap1,script=no,downscript=no \
     -device virtio-net-pci,netdev=net0,mac=52:54:00:00:00:02 \
     -fsdev local,security_model=none,id=fsdev0,path=/dev/shm \
