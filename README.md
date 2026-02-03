@@ -18,8 +18,8 @@ mkdir build
 cd build
 cmake .. -DSERVER_MODE=ON -DCMAKE_CXX_COMPILER=g++-13
 make -j$(nproc)
-wget https://asplos.dev/about/qemu.img
 wget https://asplos.dev/about/bzImage
+gdown 1ga5CN3_H1qfReer99w_QcVOYb6R21JHI
 cp qemu.img qemu1.img
 ./cxlmemsim_server --capacity=1024
 sudo ../qemu_integration/launch_qemu_cxl1.sh # login as root with password: victor129
