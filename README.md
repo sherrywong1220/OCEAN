@@ -14,17 +14,15 @@ bash ./script/setup_network.sh 2
 # If you are using multiple physical machines, Run this instead:
 bash ./script/setup_optional_cross_machine_network.sh 2
 
-cd qemu_integration
 mkdir build
 cd build
-cmake ..
+cmake .. -DSERVER_MODE=ON -DCMAKE_CXX_COMPILER=g++-13
 make -j$(nproc)
-sudo make install
 wget https://asplos.dev/about/qemu.img
 wget https://asplos.dev/about/bzImage
 cp qemu.img qemu1.img
-./start_server.sh 9999 topology_simple.txt
-sudo ../launch_qemu_cxl1.sh # login as root with password: victor129
+./cxlmemsim_server --capacity=1024
+sudo ../qemu_integration/launch_qemu_cxl1.sh # login as root with password: victor129
 # in qemu
 vi /usr/local/bin/*.sh
 # change 192.168.100.10 to 11
@@ -32,8 +30,8 @@ vi /etc/hostname
 # change node0 to node1
 shutdown now
 # out of qemu
-sudo ../launch_qemu_cxl.sh 
-sudo ../launch_qemu_cxl1.sh 
+sudo ../qemu_integration/launch_qemu_cxl.sh 
+sudo ../qemu_integration/launch_qemu_cxl1.sh 
 ```
 Make sure "/dev/dax0.0" exists inside both VM:
 ```bash

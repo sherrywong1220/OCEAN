@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 
 QEMU_BINARY=/usr/local/bin/qemu-system-x86_64
 CXL_MEMSIM_HOST=${CXL_MEMSIM_HOST:-127.0.0.1}
@@ -7,36 +7,28 @@ VM_MEMORY=${VM_MEMORY:-2G}
 CXL_MEMORY=${CXL_MEMORY:-4G}
 DISK_IMAGE=${DISK_IMAGE:-plucky-server-cloudimg-amd64.img}
 
-# Enable RDMA mode
+# Enable SHM mode with lock-free coherency
 export CXL_TRANSPORT_MODE=shm
-# Also set TCP fallback
-export CXL_MEMSIM_HOST=127.0.0.1
-export CXL_MEMSIM_PORT=9999
-
-exec $QEMU_BINARY \
+export CXL_HOST_ID=0
+$QEMU_BINARY \
     --enable-kvm -cpu qemu64,+xsave,+rdtscp,+avx,+avx2,+sse4.1,+sse4.2,+avx512f,+avx512dq,+avx512ifma,+avx512cd,+avx512bw,+avx512vl,+avx512vbmi,+clflushopt  \
+    -m 16G,maxmem=32G,slots=8 \
+    -smp 4 \
+    -M q35,cxl=on \
     -kernel ./bzImage \
-    -append "root=/dev/sda rw console=ttyS0,115200 ignore_loglevel nokaslr nokaslr nosmp nopti nospectre_v2 mem=2G" \
-    -netdev tap,id=network0,ifname=tap0,script=no,downscript=no \
-    -device e1000,netdev=network0,mac=52:54:00:00:00:01 \
+    -append "root=/dev/sda rw console=ttyS0,115200 nokaslr" \
     -drive file=./qemu.img,index=0,media=disk,format=raw \
-    -M q35,cxl=on -m 4G,maxmem=8G,slots=8 -smp 4 \
+    -netdev tap,id=net0,ifname=tap0,script=no,downscript=no \
+    -device virtio-net-pci,netdev=net0,mac=52:54:00:00:00:01 \
+    -fsdev local,security_model=none,id=fsdev0,path=/dev/shm \
+    -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshm,bus=pcie.0 \
     -device pxb-cxl,bus_nr=12,bus=pcie.0,id=cxl.1 \
     -device cxl-rp,port=0,bus=cxl.1,id=root_port13,chassis=0,slot=0 \
     -device cxl-rp,port=1,bus=cxl.1,id=root_port14,chassis=0,slot=1 \
     -device cxl-type3,bus=root_port13,persistent-memdev=cxl-mem1,lsa=cxl-lsa1,id=cxl-pmem0,sn=0x1 \
     -device cxl-type1,bus=root_port14,size=1G,cache-size=64M \
     -device virtio-cxl-accel-pci,bus=pcie.0 \
-    -object memory-backend-file,id=cxl-mem1,share=on,mem-path=/tmp/cxltest.raw,size=1G \
-    -object memory-backend-file,id=cxl-lsa1,share=on,mem-path=/tmp/lsa.raw,size=1G \
+    -object memory-backend-file,id=cxl-mem1,share=on,mem-path=/dev/shm/cxlmemsim_shared,size=1G \
+    -object memory-backend-file,id=cxl-lsa1,share=on,mem-path=/dev/shm/lsa1.raw,size=1G \
     -M cxl-fmw.0.targets.0=cxl.1,cxl-fmw.0.size=4G \
     -nographic
-
-
-
-# qemu-system-x86_64 \
-#   -m 4G -smp 4 \
-#   -drive file=/home/exouser/projects/cxlmemsim_for_got/OCEAN/qemu_integration/build/qemu.img,index=0,media=disk,format=raw \
-#   -netdev user,id=net0,hostfwd=tcp::2222-:22 \
-#   -device e1000,netdev=net0 \
-#   -nographic
